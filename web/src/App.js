@@ -1,13 +1,51 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
-// Componete
-// Estado
-// Propriedade
+import api from './services/api';
 
+import './global.css';
+import './App.css';
+import './Sidebar.css';
+
+import DevItem from './components/DevItem';
+import DevForm from './components/DevForm';
 
 function App() {
+  const [devs, setDevs] = useState([]);
+  
+  useEffect(() => {
+    async function loadDevs() {
+      const response = await api.get('/devs');
+      setDevs(response.data);
+    }
+
+    loadDevs();
+  }, [])
+
+  async function handleAddDev(data) {
+    const res = await api.post('/devs', data)
+
+    setDevs([...devs, res.data]);
+  }
+
   return (
-    <h1>Hello World</h1>
+    <div id="app">
+      <aside>
+        <strong>Cadastrar</strong>
+        <DevForm onSubmit={handleAddDev} />
+      </aside>
+      
+      <main>
+        <ul>
+          
+          {devs.map(dev => (
+          
+          <DevItem  key={dev._id} dev={dev} />
+
+          ))}
+
+        </ul>
+      </main>
+    </div>
   );
 }
 
